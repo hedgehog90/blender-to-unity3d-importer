@@ -28,10 +28,12 @@ public class EdysBlenderImporter : AssetPostprocessor
 	private bool m_forceFixRoot = false;
 
 	private float m_floatFixThreshold = 1.53e-05f;
-
+    private HashSet<Mesh> fixedMeshes = new HashSet<Mesh>();
 
 	void OnPostprocessModel (GameObject go)
 		{
+		fixedMeshes.Clear();
+		
 		string filePath = assetPath.ToLowerInvariant();
 		if (Path.GetExtension(filePath) != ".blend") m_fixBlender = false;
 
@@ -361,9 +363,12 @@ public class EdysBlenderImporter : AssetPostprocessor
 		Mesh mesh = null;
 		MeshFilter meshFilter = go.GetComponent<MeshFilter>();
 		if (meshFilter) mesh = meshFilter.sharedMesh;
+		
+        if (fixedMeshes.Contains(mesh)) return;
 
-		if (mesh)
-			{
+        if (mesh)
+		{
+            fixedMeshes.Add(mesh);
 			Vector3[] vertices = mesh.vertices;
 			Vector3[] normals = mesh.normals;
 
